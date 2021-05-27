@@ -711,11 +711,15 @@ static void moveAxis(const AxisEnum axis, const int8_t direction) {
       drawMessage(msg);
     #endif
 
+<<<<<<< HEAD
     ui.manual_move.soon(axis
       #if MULTI_E_MANUAL
         , motionAxisState.e_selection
       #endif
     );
+=======
+    ui.manual_move.soon(axis OPTARG(MULTI_E_MANUAL, motionAxisState.e_selection));
+>>>>>>> upstream/bugfix-2.0.x
   }
 
   drawAxisValue(axis);

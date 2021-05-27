@@ -182,11 +182,15 @@
       static bool constexpr processing = false;
     #endif
     static void task();
+<<<<<<< HEAD
     static void soon(const AxisEnum axis
       #if MULTI_E_MANUAL
         , const int8_t eindex=-1
       #endif
     );
+=======
+    static void soon(const AxisEnum axis OPTARG(MULTI_E_MANUAL, const int8_t eindex=active_extruder));
+>>>>>>> upstream/bugfix-2.0.x
   };
 
 #endif

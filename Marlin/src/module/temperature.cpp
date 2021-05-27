@@ -1951,6 +1951,7 @@ void Temperature::updateTemperaturesFromRawValues() {
     }
 
   #endif // HAS_HOTEND
+<<<<<<< HEAD
 
   #if ENABLED(THERMAL_PROTECTION_BED)
     #define BEDCMP(A,B) (TEMPDIR(BED) < 0 ? ((A)<(B)) : ((A)>(B)))
@@ -1964,6 +1965,21 @@ void Temperature::updateTemperaturesFromRawValues() {
     if (temp_chamber.target > 0 && CHAMBERCMP(mintemp_raw_CHAMBER, temp_chamber.raw)) min_temp_error(H_CHAMBER);
   #endif
 
+=======
+
+  #if ENABLED(THERMAL_PROTECTION_BED)
+    #define BEDCMP(A,B) (TEMPDIR(BED) < 0 ? ((A)<(B)) : ((A)>(B)))
+    if (BEDCMP(temp_bed.raw, maxtemp_raw_BED)) max_temp_error(H_BED);
+    if (temp_bed.target > 0 && BEDCMP(mintemp_raw_BED, temp_bed.raw)) min_temp_error(H_BED);
+  #endif
+
+  #if BOTH(HAS_HEATED_CHAMBER, THERMAL_PROTECTION_CHAMBER)
+    #define CHAMBERCMP(A,B) (TEMPDIR(CHAMBER) < 0 ? ((A)<(B)) : ((A)>(B)))
+    if (CHAMBERCMP(temp_chamber.raw, maxtemp_raw_CHAMBER)) max_temp_error(H_CHAMBER);
+    if (temp_chamber.target > 0 && CHAMBERCMP(mintemp_raw_CHAMBER, temp_chamber.raw)) min_temp_error(H_CHAMBER);
+  #endif
+
+>>>>>>> upstream/bugfix-2.0.x
   #if BOTH(HAS_COOLER, THERMAL_PROTECTION_COOLER)
     #define COOLERCMP(A,B) (TEMPDIR(COOLER) < 0 ? ((A)<(B)) : ((A)>(B)))
     if (cutter.unitPower > 0 && COOLERCMP(temp_cooler.raw, maxtemp_raw_COOLER)) max_temp_error(H_COOLER);
@@ -2526,7 +2542,11 @@ void Temperature::disable_all_heaters() {
       if (singlenozzle_temp[new_tool] && singlenozzle_temp[new_tool] != singlenozzle_temp[old_tool]) {
         setTargetHotend(singlenozzle_temp[new_tool], 0);
         TERN_(AUTOTEMP, planner.autotemp_update());
+<<<<<<< HEAD
         TERN_(HAS_STATUS_MESSAGE, set_heating_message(0));
+=======
+        set_heating_message(0);
+>>>>>>> upstream/bugfix-2.0.x
         (void)wait_for_hotend(0, false);  // Wait for heating or cooling
       }
     #endif
@@ -3335,11 +3355,8 @@ void Temperature::isr() {
    *   Extruder: " T0:nnn.nn /nnn.nn"
    *   With ADC: " T0:nnn.nn /nnn.nn (nnn.nn)"
    */
-  static void print_heater_state(const_celsius_float_t c, const_celsius_float_t t
-    #if ENABLED(SHOW_TEMP_ADC_VALUES)
-      , const float r
-    #endif
-    , const heater_id_t e=INDEX_NONE
+  static void print_heater_state(const heater_id_t e, const_celsius_float_t c, const_celsius_float_t t
+    OPTARG(SHOW_TEMP_ADC_VALUES, const float r)
   ) {
     char k;
     switch (e) {
@@ -3385,64 +3402,28 @@ void Temperature::isr() {
   }
 
   void Temperature::print_heater_states(const uint8_t target_extruder
-    #if ENABLED(TEMP_SENSOR_1_AS_REDUNDANT)
-      , const bool include_r/*=false*/
-    #endif
+    OPTARG(TEMP_SENSOR_1_AS_REDUNDANT, const bool include_r/*=false*/)
   ) {
     #if HAS_TEMP_HOTEND
-      print_heater_state(degHotend(target_extruder), degTargetHotend(target_extruder)
-        #if ENABLED(SHOW_TEMP_ADC_VALUES)
-          , rawHotendTemp(target_extruder)
-        #endif
-      );
+      print_heater_state(H_NONE, degHotend(target_extruder), degTargetHotend(target_extruder) OPTARG(SHOW_TEMP_ADC_VALUES, rawHotendTemp(target_extruder)));
       #if ENABLED(TEMP_SENSOR_1_AS_REDUNDANT)
-        if (include_r) print_heater_state(degHotendRedundant(), degTargetHotend(0)
-          #if ENABLED(SHOW_TEMP_ADC_VALUES)
-            , rawHotendTempRedundant()
-          #endif
-          , H_REDUNDANT
-        );
+        if (include_r) print_heater_state(H_REDUNDANT, degHotendRedundant(), degTargetHotend(0) OPTARG(SHOW_TEMP_ADC_VALUES, rawHotendTempRedundant()));
       #endif
     #endif
     #if HAS_HEATED_BED
-      print_heater_state(degBed(), degTargetBed()
-        #if ENABLED(SHOW_TEMP_ADC_VALUES)
-          , rawBedTemp()
-        #endif
-        , H_BED
-      );
+      print_heater_state(H_BED, degBed(), degTargetBed() OPTARG(SHOW_TEMP_ADC_VALUES, rawBedTemp()));
     #endif
     #if HAS_TEMP_CHAMBER
-      print_heater_state(degChamber(), TERN0(HAS_HEATED_CHAMBER, degTargetChamber())
-        #if ENABLED(SHOW_TEMP_ADC_VALUES)
-          , rawChamberTemp()
-        #endif
-        , H_CHAMBER
-      );
-    #endif // HAS_TEMP_CHAMBER
+      print_heater_state(H_CHAMBER, degChamber(), TERN0(HAS_HEATED_CHAMBER, degTargetChamber()) OPTARG(SHOW_TEMP_ADC_VALUES, rawChamberTemp()));
+    #endif
     #if HAS_TEMP_COOLER
-      print_heater_state(degCooler(), TERN0(HAS_COOLER, degTargetCooler())
-        #if ENABLED(SHOW_TEMP_ADC_VALUES)
-          , rawCoolerTemp()
-        #endif
-        , H_COOLER
-      );
-    #endif // HAS_TEMP_COOLER
+      print_heater_state(H_COOLER, degCooler(), TERN0(HAS_COOLER, degTargetCooler()) OPTARG(SHOW_TEMP_ADC_VALUES, rawCoolerTemp()));
+    #endif
     #if HAS_TEMP_PROBE
-      print_heater_state(degProbe(), 0
-        #if ENABLED(SHOW_TEMP_ADC_VALUES)
-          , rawProbeTemp()
-        #endif
-        , H_PROBE
-      );
+      print_heater_state(H_PROBE, degProbe(), 0 OPTARG(SHOW_TEMP_ADC_VALUES, rawProbeTemp()) );
     #endif
     #if HAS_MULTI_HOTEND
-      HOTEND_LOOP() print_heater_state(degHotend(e), degTargetHotend(e)
-        #if ENABLED(SHOW_TEMP_ADC_VALUES)
-          , rawHotendTemp(e)
-        #endif
-        , (heater_id_t)e
-      );
+      HOTEND_LOOP() print_heater_state((heater_id_t)e, degHotend(e), degTargetHotend(e) OPTARG(SHOW_TEMP_ADC_VALUES, rawHotendTemp(e)));
     #endif
     SERIAL_ECHOPAIR(" @:", getHeaterPower((heater_id_t)target_extruder));
     #if HAS_HEATED_BED
@@ -3465,10 +3446,7 @@ void Temperature::isr() {
 
   #if ENABLED(AUTO_REPORT_TEMPERATURES)
     AutoReporter<Temperature::AutoReportTemp> Temperature::auto_reporter;
-    void Temperature::AutoReportTemp::report() {
-      print_heater_states(active_extruder);
-      SERIAL_EOL();
-    }
+    void Temperature::AutoReportTemp::report() { print_heater_states(active_extruder); SERIAL_EOL(); }
   #endif
 
   #if HAS_HOTEND && HAS_STATUS_MESSAGE
@@ -3495,11 +3473,8 @@ void Temperature::isr() {
     #endif
 
     bool Temperature::wait_for_hotend(const uint8_t target_extruder, const bool no_wait_for_cooling/*=true*/
-      #if G26_CLICK_CAN_CANCEL
-        , const bool click_to_cancel/*=false*/
-      #endif
+      OPTARG(G26_CLICK_CAN_CANCEL, const bool click_to_cancel/*=false*/)
     ) {
-
       #if ENABLED(AUTOTEMP)
         REMEMBER(1, planner.autotemp_enabled, false);
       #endif
@@ -3638,9 +3613,7 @@ void Temperature::isr() {
     #endif
 
     bool Temperature::wait_for_bed(const bool no_wait_for_cooling/*=true*/
-      #if G26_CLICK_CAN_CANCEL
-        , const bool click_to_cancel/*=false*/
-      #endif
+      OPTARG(G26_CLICK_CAN_CANCEL, const bool click_to_cancel/*=false*/)
     ) {
       #if TEMP_BED_RESIDENCY_TIME > 0
         millis_t residency_start_ms = 0;
