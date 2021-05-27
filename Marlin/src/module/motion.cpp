@@ -89,11 +89,7 @@ bool relative_mode; // = false;
   #define Z_INIT_POS Z_HOME_POS
 #endif
 
-<<<<<<< HEAD
-xyze_pos_t current_position = { X_HOME_POS, Y_HOME_POS, Z_INIT_POS };
-=======
 xyze_pos_t current_position = LOGICAL_AXIS_ARRAY(0, X_HOME_POS, Y_HOME_POS, Z_INIT_POS);
->>>>>>> upstream/bugfix-2.0.x
 
 /**
  * Cartesian Destination
@@ -211,11 +207,6 @@ inline void report_logical_position(const xyze_pos_t &rpos) {
 // Forward kinematics and un-leveling are applied.
 void report_real_position() {
   get_cartesian_from_steppers();
-<<<<<<< HEAD
-  xyze_pos_t npos = cartes;
-  npos.e = planner.get_axis_position_mm(E_AXIS);
-  TERN_(HAS_POSITION_MODIFIERS, planner.unapply_modifiers(npos, true));
-=======
   xyze_pos_t npos = LOGICAL_AXIS_ARRAY(
     planner.get_axis_position_mm(E_AXIS),
     cartes.x, cartes.y, cartes.z
@@ -223,7 +214,6 @@ void report_real_position() {
 
   TERN_(HAS_POSITION_MODIFIERS, planner.unapply_modifiers(npos, true));
 
->>>>>>> upstream/bugfix-2.0.x
   report_logical_position(npos);
   report_more_positions();
 }
@@ -455,13 +445,7 @@ void _internal_move_to_destination(const_feedRate_t fr_mm_s/*=0.0f*/
 
   feedrate_mm_s = old_feedrate;
   feedrate_percentage = old_pct;
-<<<<<<< HEAD
-  #if HAS_EXTRUDERS
-    planner.e_factor[active_extruder] = old_fac;
-  #endif
-=======
   TERN_(HAS_EXTRUDERS, planner.e_factor[active_extruder] = old_fac);
->>>>>>> upstream/bugfix-2.0.x
 }
 
 /**
@@ -1221,18 +1205,12 @@ void prepare_line_to_destination() {
       if (TEST(b, a) && TERN(HOME_AFTER_DEACTIVATE, axis_is_trusted, axis_was_homed)(a))
         CBI(b, a);
     };
-<<<<<<< HEAD
-    set_should(axis_bits, X_AXIS);  // Clear test bits that are trusted
-    set_should(axis_bits, Y_AXIS);
-    set_should(axis_bits, Z_AXIS);
-=======
     // Clear test bits that are trusted
     LINEAR_AXIS_CODE(
       set_should(axis_bits, X_AXIS),
       set_should(axis_bits, Y_AXIS),
       set_should(axis_bits, Z_AXIS)
     );
->>>>>>> upstream/bugfix-2.0.x
     return axis_bits;
   }
 

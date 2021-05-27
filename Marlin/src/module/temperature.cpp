@@ -1951,7 +1951,6 @@ void Temperature::updateTemperaturesFromRawValues() {
     }
 
   #endif // HAS_HOTEND
-<<<<<<< HEAD
 
   #if ENABLED(THERMAL_PROTECTION_BED)
     #define BEDCMP(A,B) (TEMPDIR(BED) < 0 ? ((A)<(B)) : ((A)>(B)))
@@ -1965,21 +1964,6 @@ void Temperature::updateTemperaturesFromRawValues() {
     if (temp_chamber.target > 0 && CHAMBERCMP(mintemp_raw_CHAMBER, temp_chamber.raw)) min_temp_error(H_CHAMBER);
   #endif
 
-=======
-
-  #if ENABLED(THERMAL_PROTECTION_BED)
-    #define BEDCMP(A,B) (TEMPDIR(BED) < 0 ? ((A)<(B)) : ((A)>(B)))
-    if (BEDCMP(temp_bed.raw, maxtemp_raw_BED)) max_temp_error(H_BED);
-    if (temp_bed.target > 0 && BEDCMP(mintemp_raw_BED, temp_bed.raw)) min_temp_error(H_BED);
-  #endif
-
-  #if BOTH(HAS_HEATED_CHAMBER, THERMAL_PROTECTION_CHAMBER)
-    #define CHAMBERCMP(A,B) (TEMPDIR(CHAMBER) < 0 ? ((A)<(B)) : ((A)>(B)))
-    if (CHAMBERCMP(temp_chamber.raw, maxtemp_raw_CHAMBER)) max_temp_error(H_CHAMBER);
-    if (temp_chamber.target > 0 && CHAMBERCMP(mintemp_raw_CHAMBER, temp_chamber.raw)) min_temp_error(H_CHAMBER);
-  #endif
-
->>>>>>> upstream/bugfix-2.0.x
   #if BOTH(HAS_COOLER, THERMAL_PROTECTION_COOLER)
     #define COOLERCMP(A,B) (TEMPDIR(COOLER) < 0 ? ((A)<(B)) : ((A)>(B)))
     if (cutter.unitPower > 0 && COOLERCMP(temp_cooler.raw, maxtemp_raw_COOLER)) max_temp_error(H_COOLER);
@@ -2542,11 +2526,7 @@ void Temperature::disable_all_heaters() {
       if (singlenozzle_temp[new_tool] && singlenozzle_temp[new_tool] != singlenozzle_temp[old_tool]) {
         setTargetHotend(singlenozzle_temp[new_tool], 0);
         TERN_(AUTOTEMP, planner.autotemp_update());
-<<<<<<< HEAD
-        TERN_(HAS_STATUS_MESSAGE, set_heating_message(0));
-=======
         set_heating_message(0);
->>>>>>> upstream/bugfix-2.0.x
         (void)wait_for_hotend(0, false);  // Wait for heating or cooling
       }
     #endif

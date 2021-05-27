@@ -1827,25 +1827,12 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
   OPTARG(HAS_DIST_MM_ARG, const xyze_float_t &cart_dist_mm)
   , feedRate_t fr_mm_s, const uint8_t extruder, const_float_t millimeters/*=0.0*/
 ) {
-<<<<<<< HEAD
-
-  const int32_t da = target.a - position.a,
-                db = target.b - position.b,
-                dc = target.c - position.c;
-
-  #if HAS_EXTRUDERS
-    int32_t de = target.e - position.e;
-  #else
-    constexpr int32_t de = 0;
-  #endif
-=======
   int32_t LOGICAL_AXIS_LIST(
     de = target.e - position.e,
     da = target.a - position.a,
     db = target.b - position.b,
     dc = target.c - position.c
   );
->>>>>>> upstream/bugfix-2.0.x
 
   /* <-- add a slash to enable
     SERIAL_ECHOLNPAIR(
@@ -2020,14 +2007,6 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
 
   TERN_(LCD_SHOW_E_TOTAL, e_move_accumulator += steps_dist_mm.e);
 
-<<<<<<< HEAD
-  if (block->steps.a < MIN_STEPS_PER_SEGMENT && block->steps.b < MIN_STEPS_PER_SEGMENT && block->steps.c < MIN_STEPS_PER_SEGMENT) {
-    block->millimeters = (0
-      #if HAS_EXTRUDERS
-        + ABS(steps_dist_mm.e)
-      #endif
-    );
-=======
   if (true LINEAR_AXIS_GANG(
       && block->steps.a < MIN_STEPS_PER_SEGMENT,
       && block->steps.b < MIN_STEPS_PER_SEGMENT,
@@ -2035,7 +2014,6 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
     )
   ) {
     block->millimeters = TERN0(HAS_EXTRUDERS, ABS(steps_dist_mm.e));
->>>>>>> upstream/bugfix-2.0.x
   }
   else {
     if (millimeters)
@@ -2074,13 +2052,7 @@ bool Planner::_populate_block(block_t * const block, bool split_move,
     TERN_(BACKLASH_COMPENSATION, backlash.add_correction_steps(da, db, dc, dm, block));
   }
 
-<<<<<<< HEAD
-  #if HAS_EXTRUDERS
-    block->steps.e = esteps;
-  #endif
-=======
   TERN_(HAS_EXTRUDERS, block->steps.e = esteps);
->>>>>>> upstream/bugfix-2.0.x
 
   block->step_event_count = _MAX(LOGICAL_AXIS_LIST(
     esteps, block->steps.a, block->steps.b, block->steps.c
