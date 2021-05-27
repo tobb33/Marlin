@@ -47,7 +47,7 @@
 #endif
 
 #if ENABLED(MMU2_MENUS)
-  #include "../../lcd/menu/menu_mmu2.h"
+  #include "menu_mmu2.h"
 #endif
 
 #if ENABLED(PASSWORD_FEATURE)
@@ -105,8 +105,8 @@ void menu_configuration();
 
   void _lcd_custom_menu_main_gcode(PGM_P const cmd) {
     queue.inject_P(cmd);
-    TERN_(MAIN_MENU_ITEM_SCRIPT_AUDIBLE_FEEDBACK, ui.completion_feedback());
-    TERN_(MAIN_MENU_ITEM_SCRIPT_RETURN, ui.return_to_status());
+    TERN_(CUSTOM_MENU_MAIN_SCRIPT_AUDIBLE_FEEDBACK, ui.completion_feedback());
+    TERN_(CUSTOM_MENU_MAIN_SCRIPT_RETURN, ui.return_to_status());
   }
 
   void custom_menus_main() {
